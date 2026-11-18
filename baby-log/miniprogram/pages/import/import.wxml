@@ -1,0 +1,56 @@
+<view class="page">
+  <view class="card tip">
+    <view class="card-title">两种导入方式</view>
+    <view class="muted small">A) 直接选原始脏 xlsx（推荐）：手机/电脑把 .xlsx 发到微信 → 这里选它 → 云函数解析出预览 → 确认入库。无需电脑脚本。</view>
+    <view class="muted small">B) 选已生成的 import_preview.json（电脑 tools/parse_excel.py 产物）。</view>
+    <view class="muted small">吐奶/过期体温/黄疸笔误会自动剔除；老 .xls 请先另存为 .xlsx。</view>
+  </view>
+
+  <!-- 步骤1 选择 -->
+  <view wx:if="{{stage==='pick'}}" class="card centerbox">
+    <view class="big">📊</view>
+    <view class="btn block" bindtap="chooseExcel">选择原始 Excel (.xlsx)</view>
+    <view class="btn ghost block mt16" bindtap="choose">选择 import_preview.json</view>
+  </view>
+
+  <!-- 步骤2 预览 -->
+  <view wx:elif="{{stage==='preview'}}">
+    <view class="card">
+      <view class="card-title">导入预览</view>
+      <view class="prow"><text>吃奶记录</text><text>{{sum.feeding}} 条</text></view>
+      <view class="prow"><text>辅食记录</text><text>{{sum.solid}} 条</text></view>
+      <view class="prow"><text>每日备注</text><text>{{sum.note}} 条</text></view>
+      <view class="prow"><text>体重/体温/黄疸</text><text>{{sum.health}} 条</text></view>
+      <view class="prow"><text>奶量档位</text><text>{{sum.milkOptions}} 档</text></view>
+    </view>
+
+    <view wx:if="{{report}}" class="card">
+      <view class="card-title">质量报告（自动处理）</view>
+      <view class="prow"><text>跳过公式行</text><text>{{report.skippedFormulaRows}}</text></view>
+      <view class="prow"><text>吐奶(不计总量)</text><text>{{report.vomitCount}} 条</text></view>
+      <view class="prow"><text>过期体温丢弃</text><text>{{report.tempsDropped}} 条</text></view>
+      <view class="prow"><text>黄疸笔误丢弃</text><text>{{report.jaundiceDropped}} 条</text></view>
+      <view class="prow"><text>待人工确认</text><text>{{report.uncertainRows}} 行</text></view>
+    </view>
+
+    <view class="btn block" bindtap="doImport">确认导入（先清本次区间旧数据再写入）</view>
+    <view class="btn ghost block mt16" bindtap="reset">重新选择</view>
+  </view>
+
+  <!-- 步骤3 进度/完成 -->
+  <view wx:else class="card">
+    <block wx:if="{{!result}}">
+      <view class="card-title">导入中…</view>
+      <view class="muted small">{{progress.step}}</view>
+      <view wx:if="{{progress.total}}" class="pg"><view class="pg-in" style="width:{{pct}}%"></view></view>
+    </block>
+    <block wx:else>
+      <view class="centerbox">
+        <view class="big">✅</view>
+        <view class="card-title" style="text-align:center">导入完成</view>
+        <view class="muted small">写入 {{result.inserted}} 条，覆盖 {{result.days}} 天</view>
+        <view class="btn block mt24" bindtap="goHome">去今日查看</view>
+      </view>
+    </block>
+  </view>
+</view>

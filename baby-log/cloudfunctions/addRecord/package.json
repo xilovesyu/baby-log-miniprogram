@@ -1,0 +1,7 @@
+{
+  "name": "addRecord",
+  "version": "1.0.0",
+  "description": "统一写入/修改/删除记录，并触发每日聚合",
+  "main": "index.js",
+  "dependencies": { "wx-server-sdk": "~2.6.3" }
+}

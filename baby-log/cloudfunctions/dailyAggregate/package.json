@@ -1,0 +1,7 @@
+{
+  "name": "dailyAggregate",
+  "version": "1.0.0",
+  "description": "重算指定日期的每日汇总与全量累计奶量",
+  "main": "index.js",
+  "dependencies": { "wx-server-sdk": "~2.6.3" }
+}

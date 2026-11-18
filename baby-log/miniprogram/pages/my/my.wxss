@@ -1,0 +1,10 @@
+.profile { display: flex; align-items: center; }
+.avatar { width: 96rpx; height: 96rpx; border-radius: 50%; background: var(--primary-light); color: var(--primary); font-size: 40rpx; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-right: 24rpx; }
+.pname { font-size: 36rpx; font-weight: 700; }
+.baby-list { display: flex; flex-wrap: wrap; }
+.bitem { padding: 12rpx 28rpx; border-radius: 30rpx; background: #F1F3F6; margin: 6rpx 12rpx 6rpx 0; font-size: 26rpx; }
+.bitem.on { background: var(--primary); color: #fff; }
+.menu-row { display: flex; justify-content: space-between; align-items: center; padding: 26rpx 4rpx; border-bottom: 1rpx solid var(--line); font-size: 30rpx; }
+.menu-row:last-child { border-bottom: none; }
+.menu-row.danger { color: var(--danger); justify-content: center; }
+.center { text-align: center; }

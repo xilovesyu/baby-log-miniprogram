@@ -1,0 +1,10 @@
+.mrow { display: flex; align-items: center; padding: 20rpx 0; border-bottom: 1rpx solid var(--line); font-size: 28rpx; }
+.mrow text { flex: 1; }
+.mrow text.mini { flex: 0 0 auto; }
+.mrow.head { color: var(--text-sub); font-size: 24rpx; }
+.mrow:last-child { border-bottom: none; }
+.link { color: var(--primary); font-size: 26rpx; }
+.mini { color: var(--primary); font-size: 26rpx; margin-left: 20rpx; }
+.mini.danger { color: var(--danger); }
+.code-t { font-weight: 700; letter-spacing: 2rpx; color: var(--primary); }
+.menu-row { display: flex; justify-content: space-between; align-items: center; padding: 8rpx 0; font-size: 30rpx; }

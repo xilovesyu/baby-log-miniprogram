@@ -1,0 +1,49 @@
+<view class="page">
+  <view class="card">
+    <view class="avatar-row" bindtap="chooseAvatar">
+      <image wx:if="{{avatarUrl}}" class="avatar-img" src="{{avatarUrl}}" mode="aspectFill" />
+      <view wx:else class="avatar-ph">＋</view>
+      <view class="col">
+        <text>宝宝头像</text>
+        <text class="muted small">{{avatarUrl ? '点击更换' : '点击上传（选填）'}}</text>
+      </view>
+    </view>
+    <view class="form-row">
+      <view class="form-label">昵称</view>
+      <input class="form-input" value="{{form.name}}" data-k="name" bindinput="onInput" />
+    </view>
+    <view class="form-row">
+      <view class="form-label">性别</view>
+      <picker class="grow" mode="selector" range="{{genders}}" range-key="label" value="{{genderIndex}}" bindchange="onGender">
+        <view class="form-value picker-value">{{genders[genderIndex].label}}</view>
+      </picker>
+    </view>
+    <view class="form-row">
+      <view class="form-label">出生日期</view>
+      <picker class="grow" mode="date" end="{{today}}" value="{{form.birthDate}}" bindchange="onBirth">
+        <view class="form-value picker-value">{{form.birthDate}}</view>
+      </picker>
+    </view>
+    <view class="form-row">
+      <view class="form-label">出生体重</view>
+      <input class="form-input" type="digit" placeholder="选填" value="{{form.birthWeight}}" data-k="birthWeight" bindinput="onInput" />
+      <view class="unit-switch" bindtap="toggleWeightUnit">{{weightUnit}}</view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="form-row">
+      <view class="form-label">体温提醒阈值</view>
+      <input class="form-input" type="digit" value="{{form.tempAlertC}}" data-k="tempAlertC" bindinput="onInput" />
+      <text class="muted small">℃</text>
+    </view>
+    <view class="form-row">
+      <view class="form-label">辅食起始日</view>
+      <picker class="grow" mode="date" value="{{form.solidFoodStartDate}}" bindchange="onSolidStart">
+        <view class="form-value picker-value">{{form.solidFoodStartDate}}</view>
+      </picker>
+    </view>
+  </view>
+
+  <view class="btn block" bindtap="save">保存</view>
+</view>

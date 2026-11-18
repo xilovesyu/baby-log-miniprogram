@@ -1,0 +1,72 @@
+<view class="page">
+  <view class="tabs">
+    <view class="tab {{tab==='milk'?'on':''}}" data-t="milk" bindtap="setTab">奶量</view>
+    <view class="tab {{tab==='weight'?'on':''}}" data-t="weight" bindtap="setTab">体重</view>
+    <view class="tab {{tab==='temp'?'on':''}}" data-t="temp" bindtap="setTab">体温</view>
+    <view class="tab {{tab==='jaundice'?'on':''}}" data-t="jaundice" bindtap="setTab">黄疸</view>
+  </view>
+
+  <block wx:if="{{tab==='milk'}}">
+    <view class="card">
+      <view class="row-between">
+        <view class="card-title" style="margin:0">每日总奶量</view>
+        <view class="ranges">
+          <text class="{{range==='7'?'on':''}}" data-r="7" bindtap="setRange">7天</text>
+          <text class="{{range==='30'?'on':''}}" data-r="30" bindtap="setRange">30天</text>
+          <text class="{{range==='all'?'on':''}}" data-r="all" bindtap="setRange">全部</text>
+        </view>
+      </view>
+      <view wx:if="{{!bars.length}}" class="empty">暂无数据</view>
+      <view wx:else>
+        <view class="bar-info">{{activeBarText || '点柱看当日奶量'}}</view>
+        <view class="bars">
+          <view class="barwrap" wx:for="{{bars}}" wx:key="date" data-date="{{item.date}}" data-label="{{item.label}}" data-total="{{item.total}}" bindtap="onBarTap">
+            <view class="bar {{activeBar===item.date?'on':''}}" style="height:{{item.h}}rpx">
+              <view class="bartip">{{item.total}}</view>
+            </view>
+            <text class="barx">{{item.label}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="card-title">概览</view>
+      <view class="grid4">
+        <view class="cell"><view class="sub-num">{{avgDaily}}</view><view class="stat-label">日均ml</view></view>
+        <view class="cell"><view class="sub-num">{{maxFeed}}</view><view class="stat-label">最大单次</view></view>
+        <view class="cell"><view class="sub-num">{{minFeed}}</view><view class="stat-label">最小单次</view></view>
+        <view class="cell"><view class="sub-num">{{feedTimes}}</view><view class="stat-label">总次数</view></view>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="card-title">月度汇总</view>
+      <view wx:if="{{!monthly.length}}" class="empty">暂无数据</view>
+      <view wx:else>
+        <view class="mrow head"><text>月份</text><text>总奶量</text><text>次数</text><text>平均单次</text></view>
+        <view class="mrow" wx:for="{{monthly}}" wx:key="month">
+          <text>{{item.month}}</text><text>{{item.totalMilkMl}}</text><text>{{item.feedCount}}</text><text>{{item.avgPerFeed}}</text>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <block wx:else>
+    <view class="card">
+      <view class="row-between">
+        <view class="card-title" style="margin:0">{{seriesTitle}}</view>
+        <text class="muted small">{{seriesMeta}}</text>
+      </view>
+      <view class="chartbox">
+        <line-chart data="{{series}}" color="{{seriesColor}}" unit="{{seriesUnit}}" digits="{{seriesDigits}}" height="{{240}}" />
+      </view>
+      <view wx:if="{{series.length}}" class="grid4 mt8">
+        <view class="cell"><view class="sub-num small">{{series[0].yLabel}}</view><view class="stat-label">起</view></view>
+        <view class="cell"><view class="sub-num small">{{series[series.length-1].yLabel}}</view><view class="stat-label">末</view></view>
+        <view class="cell"><view class="sub-num small">{{seriesMinLabel}}</view><view class="stat-label">最低</view></view>
+        <view class="cell"><view class="sub-num small">{{seriesMaxLabel}}</view><view class="stat-label">最高</view></view>
+      </view>
+    </view>
+  </block>
+</view>

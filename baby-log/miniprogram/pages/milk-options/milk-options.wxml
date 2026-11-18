@@ -1,0 +1,32 @@
+<view class="page">
+  <view class="card tip muted small">这些数值用于「记奶量」页的快选宫格。点 ✕ 删除，下方输入新增，保存后生效。</view>
+
+  <view class="card">
+    <view class="row-between">
+      <view class="card-title" style="margin:0">当前档位（{{options.length}} 档）</view>
+      <text class="link" bindtap="resetDefaults">恢复默认</text>
+    </view>
+    <view class="chips">
+      <view class="mo-chip" wx:for="{{options}}" wx:key="*this">
+        <text>{{item}}ml</text>
+        <text class="mo-x" data-v="{{item}}" bindtap="remove">✕</text>
+      </view>
+      <text wx:if="{{!options.length}}" class="muted small">暂无档位，请新增或恢复默认</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">新增档位</view>
+    <view class="row">
+      <input class="form-input add-input" type="number" placeholder="如 95" value="{{input}}" bindinput="onInput" />
+      <text class="unit-suffix">ml</text>
+      <view class="btn btn-sm add-btn" bindtap="add">添加</view>
+    </view>
+    <view class="row mt16">
+      <text class="muted small mr8">快捷：</text>
+      <text class="tag gray mr8" wx:for="{{suggests}}" wx:key="*this" data-v="{{item}}" bindtap="quickAdd">{{item}}</text>
+    </view>
+  </view>
+
+  <view class="btn block" bindtap="save">保存</view>
+</view>

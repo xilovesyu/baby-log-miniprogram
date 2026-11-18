@@ -1,0 +1,5 @@
+<view class="lc">
+  <canvas type="2d" id="c" class="lc-canvas" style="height:{{height}}px"
+          bindtouchstart="onTouch" bindtouchmove="onTouch"></canvas>
+  <view wx:if="{{tip.show}}" class="lc-tip" style="left:{{tip.left}}px;top:{{tip.top}}px">{{tip.text}}</view>
+</view>

@@ -1,0 +1,7 @@
+.tip { background: var(--primary-light); }
+.centerbox { text-align: center; padding: 40rpx 0; }
+.big { font-size: 80rpx; margin-bottom: 20rpx; }
+.prow { display: flex; justify-content: space-between; padding: 18rpx 0; border-bottom: 1rpx solid var(--line); }
+.prow:last-child { border-bottom: none; }
+.pg { height: 16rpx; background: #F1F3F6; border-radius: 8rpx; overflow: hidden; margin-top: 20rpx; }
+.pg-in { height: 100%; background: var(--primary); width: 0; transition: width .2s; }

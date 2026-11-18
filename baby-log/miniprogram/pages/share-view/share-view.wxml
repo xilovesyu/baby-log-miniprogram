@@ -1,0 +1,30 @@
+<view class="page">
+  <block wx:if="{{!data}}">
+    <view class="card">
+      <view class="card-title">输入分享口令</view>
+      <input class="form-input code" placeholder="请输入 10 位口令" value="{{input}}" bindinput="onInput" />
+      <view class="btn block mt16" bindtap="loadByCode">查看</view>
+    </view>
+  </block>
+
+  <block wx:else>
+    <view class="watermark">只读分享 · 截至 {{data.lastDate}}</view>
+    <view class="card">
+      <view class="card-title">{{data.baby.name}} 的近况</view>
+      <view wx:if="{{!data.events.length}}" class="empty">暂无数据</view>
+      <view wx:else class="timeline">
+        <view class="tl-item" wx:for="{{data.events}}" wx:key="index">
+          <view class="tl-time">{{item.time || '未记'}}</view>
+          <view class="tl-body"><view class="tl-main">{{item.main}}</view></view>
+        </view>
+      </view>
+    </view>
+    <view class="card">
+      <view class="card-title">近期每日总奶量</view>
+      <view class="mrow head"><text>日期</text><text>当日(ml)</text><text>累计(ml)</text></view>
+      <view class="mrow" wx:for="{{data.days}}" wx:key="date">
+        <text>{{item.date}}</text><text>{{item.totalMilkMl}}</text><text>{{item.cumulativeMilkMl}}</text>
+      </view>
+    </view>
+  </block>
+</view>

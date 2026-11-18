@@ -1,0 +1,22 @@
+# 依赖与构建产物
+node_modules/
+miniprogram_npm/
+*.log
+
+# 系统/编辑器杂项
+.DS_Store
+Thumbs.db
+
+# 机器私有配置 / 本地密钥（含 AppID、云环境 ID，不入库）
+baby-log/project.private.config.json
+baby-log/miniprogram/cloud.config.js
+
+# ⚠️ 真实健康数据，绝不入库
+data/
+import-preview/
+docs/screenshots/
+
+# 会话临时图片/产物
+.qoder-input-images/
+.qoder-input-files/
+.qwenwork-media-result-*.json

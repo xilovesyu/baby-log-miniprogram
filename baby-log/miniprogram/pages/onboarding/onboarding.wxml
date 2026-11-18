@@ -1,0 +1,35 @@
+<view class="page">
+  <view wx:if="{{!cloudReady}}" class="card" style="background:#FDECEA;color:#E5645A">
+    未配置云开发环境 ID，暂时无法保存。请打开 miniprogram/cloud.js 填入你的 envId 后重新编译。
+  </view>
+
+  <view class="card">
+    <view class="card-title">宝宝信息</view>
+    <view class="form-row">
+      <view class="form-label">昵称<text class="req">*</text></view>
+      <input class="form-input" placeholder="如：西柚" value="{{form.name}}" data-k="name" bindinput="onInput" />
+    </view>
+    <view class="form-row">
+      <view class="form-label">性别</view>
+      <picker class="grow" mode="selector" range="{{genders}}" range-key="label" value="{{genderIndex}}" bindchange="onGender">
+        <view class="form-value picker-value">{{genders[genderIndex].label}}</view>
+      </picker>
+    </view>
+    <view class="form-row">
+      <view class="form-label">出生日期<text class="req">*</text></view>
+      <picker class="grow" mode="date" start="{{minDate}}" end="{{today}}" value="{{form.birthDate}}" bindchange="onBirth">
+        <view class="form-value picker-value">{{form.birthDate || '请选择'}}</view>
+      </picker>
+    </view>
+    <view class="form-row">
+      <view class="form-label">出生体重</view>
+      <input class="form-input" type="digit" placeholder="选填" value="{{form.birthWeight}}" data-k="birthWeight" bindinput="onInput" />
+      <view class="unit-switch" bindtap="toggleWeightUnit">{{weightUnit}}</view>
+    </view>
+  </view>
+
+  <view class="btn block" bindtap="submit">保存并开始记录</view>
+  <view class="mt16 center">
+    <text class="muted small" bindtap="goImport">有现成 Excel 记录？先导入 ›</text>
+  </view>
+</view>

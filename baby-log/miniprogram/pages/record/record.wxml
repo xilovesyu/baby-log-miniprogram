@@ -1,0 +1,129 @@
+<view class="page">
+  <!-- 日期 -->
+  <view class="card">
+    <view class="form-row">
+      <view class="form-label">日期</view>
+      <picker class="grow" mode="date" value="{{form.date}}" end="{{today}}" bindchange="onDate">
+        <view class="form-value picker-value">{{form.date}}</view>
+      </picker>
+    </view>
+    <view wx:if="{{type!=='sleep'}}" class="form-row">
+      <view class="form-label">时间</view>
+      <picker class="grow" mode="time" value="{{form.time}}" bindchange="onTime">
+        <view class="form-value picker-value">{{form.time || '未记录(可空)'}}</view>
+      </picker>
+    </view>
+
+    <!-- 吃奶 -->
+    <block wx:if="{{type==='feeding'}}">
+      <view class="form-row" style="border-bottom:none;align-items:flex-start">
+        <view class="form-label" style="padding-top:14rpx">奶量</view>
+        <view class="grow">
+          <view class="chips">
+            <view class="chip {{form.amountMl==item?'active':''}}" wx:for="{{milkOptions}}" wx:key="*this" data-v="{{item}}" bindtap="pickAmount">{{item}}</view>
+          </view>
+          <view class="row mt16">
+            <input class="form-input" style="border:1rpx solid var(--line);border-radius:12rpx;padding:12rpx 20rpx" type="number" placeholder="手动输入 ml" value="{{amountInput}}" bindinput="onAmountInput" />
+            <text wx:if="{{lastAmount}}" class="reuse" bindtap="reuseLast">沿用上次 {{lastAmount}}</text>
+          </view>
+          <label class="row mt16" bindtap="toggleVomited">
+            <view class="checkbox {{form.vomited?'on':''}}"></view>
+            <text class="small">吐了（勾选后不计入当日总奶量）</text>
+          </label>
+        </view>
+      </view>
+    </block>
+
+    <!-- 辅食 -->
+    <block wx:elif="{{type==='solid'}}">
+      <view class="form-row">
+        <view class="form-label">餐次</view>
+        <picker class="grow" mode="selector" range="{{meals}}" range-key="label" value="{{mealIndex}}" bindchange="onMeal">
+          <view class="form-value picker-value">{{meals[mealIndex].label}}</view>
+        </picker>
+      </view>
+      <view class="form-row">
+        <view class="form-label">食物内容</view>
+        <input class="form-input" placeholder="如：番茄菠菜萝卜牛肉烩饭" value="{{form.food}}" data-k="food" bindinput="onInput" />
+      </view>
+      <view class="form-row">
+        <view class="form-label">份量</view>
+        <input class="form-input" placeholder="选填，如 1/2" value="{{form.portion}}" data-k="portion" bindinput="onInput" />
+      </view>
+    </block>
+
+    <!-- 便便 -->
+    <block wx:elif="{{type==='diaper'}}">
+      <view class="form-row">
+        <view class="form-label">性状</view>
+        <picker class="grow" mode="selector" range="{{textures}}" value="{{textureIndex}}" bindchange="onTexture">
+          <view class="form-value picker-value">{{textures[textureIndex]}}</view>
+        </picker>
+      </view>
+      <view class="form-row">
+        <view class="form-label">颜色</view>
+        <picker class="grow" mode="selector" range="{{colors}}" value="{{colorIndex}}" bindchange="onColor">
+          <view class="form-value picker-value">{{colors[colorIndex]}}</view>
+        </picker>
+      </view>
+    </block>
+
+    <!-- 睡眠 -->
+    <block wx:elif="{{type==='sleep'}}">
+      <view class="form-row">
+        <view class="form-label">开始</view>
+        <picker class="grow" mode="time" value="{{form.startHM}}" bindchange="onStartHM">
+          <view class="form-value picker-value">{{form.startHM || '请选择'}}</view>
+        </picker>
+      </view>
+      <view class="form-row">
+        <view class="form-label">结束</view>
+        <picker class="grow" mode="time" value="{{form.endHM}}" bindchange="onEndHM">
+          <view class="form-value picker-value">{{form.endHM || '请选择'}}</view>
+        </picker>
+      </view>
+      <view class="small muted mt8">时长：{{durationText}}</view>
+    </block>
+
+    <!-- 体温 -->
+    <block wx:elif="{{type==='temp'}}">
+      <view class="form-row">
+        <view class="form-label">温度℃</view>
+        <input class="form-input" type="digit" placeholder="如 36.8" value="{{form.valueC}}" data-k="valueC" bindinput="onTemp" />
+      </view>
+      <view wx:if="{{tempWarn}}" class="small mt8" style="color:var(--warn)">⚠️ 体温偏高（阈值 {{tempAlertC}}℃），请留意</view>
+    </block>
+
+    <!-- 体重 -->
+    <block wx:elif="{{type==='weight'}}">
+      <view class="form-row">
+        <view class="form-label">体重</view>
+        <input class="form-input" type="digit" placeholder="数值" value="{{form.weightInput}}" data-k="weightInput" bindinput="onInput" />
+        <view class="unit-switch" bindtap="toggleUnit">{{unit}}</view>
+      </view>
+    </block>
+
+    <!-- 黄疸 -->
+    <block wx:elif="{{type==='jaundice'}}">
+      <view class="form-row">
+        <view class="form-label">黄疸值</view>
+        <input class="form-input" type="digit" placeholder="数值" value="{{form.valueJ}}" data-k="valueJ" bindinput="onInput" />
+      </view>
+      <view class="form-row">
+        <view class="form-label">测量方式</view>
+        <picker class="grow" mode="selector" range="{{methods}}" value="{{methodIndex}}" bindchange="onMethod">
+          <view class="form-value picker-value">{{methods[methodIndex] || '选填'}}</view>
+        </picker>
+      </view>
+    </block>
+  </view>
+
+  <!-- 备注 -->
+  <view class="card">
+    <view class="card-title">备注</view>
+    <textarea class="note-area" placeholder="可选，如 换奶粉了 / 拉屎了 / 精神好" value="{{form.note}}" data-k="note" bindinput="onInput" maxlength="200" />
+  </view>
+
+  <view class="btn block" bindtap="save">{{isEdit ? '保存修改' : '保存'}}</view>
+  <view wx:if="{{!isEdit}}" class="btn ghost block mt16" bindtap="saveAndAgain">保存并再记一条</view>
+</view>
