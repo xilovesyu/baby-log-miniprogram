@@ -5,8 +5,11 @@ App({
     cloudReady: false,
     openid: "",
     currentBabyId: "",
-    currentBaby: null
+    currentBaby: null,
+    rev: 0
   },
+
+  markDataChanged() { this.globalData.rev = (this.globalData.rev || 0) + 1; },
 
   onLaunch() {
     if (!wx.cloud) {

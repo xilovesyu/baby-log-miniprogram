@@ -3,6 +3,7 @@ const cloud = require("wx-server-sdk");
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
 const _ = db.command;
+const $ = db.command.aggregate;
 
 const DEFAULT_OPTIONS = [30, 50, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170,
   180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290];
@@ -131,9 +132,10 @@ exports.main = async (event) => {
   if (action === "stats") {
     const N = range === "all" ? 0 : Number(range || 30);
     let where = { babyId };
+    let start = null;
     if (N > 0) {
       const now = new Date(); now.setUTCDate(now.getUTCDate() - N);
-      const start = now.getUTCFullYear() + "-" + pad(now.getUTCMonth() + 1) + "-" + pad(now.getUTCDate());
+      start = now.getUTCFullYear() + "-" + pad(now.getUTCMonth() + 1) + "-" + pad(now.getUTCDate());
       where.date = _.gte(start);
     }
     const sums = (await all("daily_summaries", where, ["date", "asc"]));
@@ -157,11 +159,36 @@ exports.main = async (event) => {
     let maxFeed = 0, minFeed = 0;
     const feeds = await all("records", { babyId, type: "feeding", vomited: _.neq(true) }, ["createdAt", "asc"]);
     for (const f of feeds) { const v = Number(f.amountMl || 0); if (v > maxFeed) maxFeed = v; if (!minFeed || v < minFeed) minFeed = v; }
+    // —— 记录次数统计（聚合，不拉全表）——
+    const rangeMatch = N > 0 ? { babyId, date: _.gte(start) } : { babyId };
+    const typeCounts = {};
+    let totalRecords = 0;
+    try {
+      const tc = await db.collection("records").aggregate().match(rangeMatch)
+        .group({ _id: "$type", n: $.sum(1) }).limit(100).end();
+      (tc.list || []).forEach(x => { if (x._id) { typeCounts[x._id] = x.n; totalRecords += x.n; } });
+    } catch (e) {}
+    let recordDays = 0, avgRecordsPerDay = 0, longestStreak = 0;
+    try {
+      const dt = await db.collection("records").aggregate().match(rangeMatch)
+        .group({ _id: "$date", n: $.sum(1) }).limit(1000).end();
+      const dates = (dt.list || []).map(x => x._id).filter(Boolean).sort();
+      recordDays = dates.length;
+      avgRecordsPerDay = recordDays ? Math.round(totalRecords / recordDays) : 0;
+      let run = 0, prev = null;
+      for (const ds of dates) {
+        if (prev) { const diff = (Date.parse(ds) - Date.parse(prev)) / 86400000; run = (diff === 1) ? run + 1 : 1; }
+        else run = 1;
+        if (run > longestStreak) longestStreak = run;
+        prev = ds;
+      }
+    } catch (e) {}
     return { ok: true, data: {
       days: sums.map(s => ({ date: s.date, totalMilkMl: s.totalMilkMl, cumulativeMilkMl: s.cumulativeMilkMl })),
       monthly: monthlyList, avgDaily, maxFeed, minFeed, feedTimes: feeds.length,
       weights, temps, jaundice,
-      recordDayCount: valid.length
+      recordDayCount: valid.length,
+      typeCounts, totalRecords, recordDays, avgRecordsPerDay, longestStreak
     } };
   }
 

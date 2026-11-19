@@ -20,10 +20,13 @@
         <view class="dmilk">{{item.blank ? '' : (item.recorded ? item.total + 'ml' : (item.isFuture ? '' : '未记录'))}}</view>
         <view class="dots">
           <text wx:if="{{item.hasSolid}}" class="dot solid"></text>
-          <text wx:if="{{item.hasTemp}}" class="dot temp"></text>
-          <text wx:if="{{item.hasWeight}}" class="dot weight"></text>
+          <text wx:if="{{item.hasDiaper}}" class="dot diaper"></text>
         </view>
       </view>
+    </view>
+
+    <view class="legend">
+      <view class="lg" wx:for="{{legend}}" wx:key="key"><text class="dot {{item.key}}"></text>{{item.label}}</view>
     </view>
   </view>
 
@@ -44,6 +47,11 @@
           <view wx:if="{{item.note}}" class="tl-note">{{item.note}}</view></view>
       </view>
     </scroll-view>
-    <view class="btn block mt16" bindtap="addOnDay">补录一条</view>
+    <view class="add-title">补录一条</view>
+    <view class="addrow">
+      <view class="addbtn" wx:for="{{addTypes}}" wx:key="type" data-type="{{item.type}}" bindtap="addOnDay">
+        <text class="ai">{{item.icon}}</text><text class="al">{{item.label}}</text>
+      </view>
+    </view>
   </view>
 </view>

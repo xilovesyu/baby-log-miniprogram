@@ -54,6 +54,7 @@ async function run(preview, babyId, onProgress) {
   }
   if (onProgress) onProgress({ step: "计算累计奶量", done: 1, total: 1 });
   await api.call("dailyAggregate", { babyId, rebuildCumulative: true });
+  try { getApp().markDataChanged(); } catch (e) {}
   return { inserted, days: dates.length, summary: s };
 }
 

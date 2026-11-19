@@ -3,7 +3,14 @@
     未配置云环境 ID，无法读写数据。见 miniprogram/cloud.js 与 README。
   </view>
 
-  <view class="baby-bar" bindtap="goMy">
+  <!-- 宝宝栏 -->
+  <view wx:if="{{loading}}" class="baby-bar">
+    <view class="col grow">
+      <view class="skel" style="width:200rpx;height:34rpx"></view>
+      <view class="skel" style="width:140rpx;height:24rpx;margin-top:10rpx"></view>
+    </view>
+  </view>
+  <view wx:elif="{{cloudReady}}" class="baby-bar" bindtap="goMy">
     <view class="col">
       <text class="baby-name">{{baby.name || '未命名宝宝'}}</text>
       <text class="muted small">{{ageText}}</text>
@@ -11,7 +18,15 @@
     <text class="switch muted">切换 / 档案 ›</text>
   </view>
 
-  <view class="card">
+  <!-- 今日概览 -->
+  <view class="card" wx:if="{{loading}}">
+    <view class="row-between"><view class="skel" style="width:160rpx;height:30rpx"></view><view class="skel" style="width:120rpx;height:24rpx"></view></view>
+    <view class="skel" style="width:240rpx;height:64rpx;margin:24rpx 0"></view>
+    <view class="grid4">
+      <view class="cell" wx:for="{{[1,2,3,4]}}" wx:key="*this"><view class="skel" style="width:60%;height:34rpx;margin:0 auto"></view></view>
+    </view>
+  </view>
+  <view class="card" wx:elif="{{cloudReady}}">
     <view class="row-between">
       <view class="card-title" style="margin:0">{{dateLabel}}</view>
       <text class="muted small">累计 {{cumulative}}ml</text>
@@ -29,16 +44,17 @@
     <view class="small muted mt8">睡眠 {{sleepText}}</view>
   </view>
 
+  <!-- 快捷按钮：静态，立即可用 -->
   <view class="card quick">
-    <view class="qbtn" bindtap="goRecord" data-type="feeding"><text class="qi">🍼</text><text>记奶量</text></view>
-    <view class="qbtn" bindtap="goRecord" data-type="solid"><text class="qi">🥣</text><text>记辅食</text></view>
-    <view class="qbtn" bindtap="goRecord" data-type="diaper"><text class="qi">💩</text><text>记便便</text></view>
-    <view class="qbtn" bindtap="goRecord" data-type="sleep"><text class="qi">😴</text><text>记睡眠</text></view>
-    <view class="qbtn" bindtap="goRecord" data-type="temp"><text class="qi">🌡️</text><text>记体温</text></view>
-    <view class="qbtn" bindtap="goRecord" data-type="weight"><text class="qi">⚖️</text><text>记体重</text></view>
+    <view class="qbtn" wx:for="{{quickTypes}}" wx:key="type" bindtap="goRecord" data-type="{{item.type}}"><text class="qi">{{item.icon}}</text><text>记{{item.label}}</text></view>
   </view>
 
-  <view class="card">
+  <!-- 时间轴 -->
+  <view class="card" wx:if="{{loading}}">
+    <view class="card-title">今日时间轴</view>
+    <view class="skel" wx:for="{{[1,2,3]}}" wx:key="*this" style="height:44rpx;margin:20rpx 0"></view>
+  </view>
+  <view class="card" wx:elif="{{cloudReady}}">
     <view class="card-title">今日时间轴</view>
     <view wx:if="{{!events.length}}" class="empty">
       <image class="empty-img" src="/images/empty/empty-records.png" mode="aspectFit" />

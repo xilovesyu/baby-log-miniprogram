@@ -49,5 +49,6 @@ Page({
     } catch (e) { wx.hideLoading(); }
   },
 
-  goImport() { wx.navigateTo({ url: "/pages/import/import" }); }
+  goImport() { wx.navigateTo({ url: "/pages/import/import" }); },
+  goShareView() { wx.navigateTo({ url: "/pages/share-view/share-view" }); }
 });

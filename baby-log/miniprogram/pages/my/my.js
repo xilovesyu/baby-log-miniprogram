@@ -40,6 +40,7 @@ Page({
 
   editProfile() { wx.navigateTo({ url: "/pages/baby-profile/baby-profile?id=" + this.data.current._id }); },
   goFamily() { wx.navigateTo({ url: "/pages/family/family" }); },
+  goShareView() { wx.navigateTo({ url: "/pages/share-view/share-view" }); },
   goMilkOptions() { wx.navigateTo({ url: "/pages/milk-options/milk-options?babyId=" + this.data.current._id }); },
   createNew() { wx.navigateTo({ url: "/pages/onboarding/onboarding" }); },
   doImport() { wx.navigateTo({ url: "/pages/import/import?babyId=" + this.data.current._id }); },

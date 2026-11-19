@@ -3,6 +3,23 @@ const babySvc = require("../../services/baby");
 const data = require("../../services/data");
 const U = require("../../utils/date");
 const units = require("../../utils/units");
+const rt = require("../../utils/recordTypes");
+
+function buildRecord(r) {
+  const tc = r.typeCounts || {};
+  const max = Math.max(1, ...rt.STATS.map(t => tc[t.k] || 0));
+  const items = rt.STATS.map(t => ({
+    label: t.label, color: t.color, count: tc[t.k] || 0,
+    w: Math.round((tc[t.k] || 0) / max * 100)
+  }));
+  return {
+    total: r.totalRecords || 0,
+    days: r.recordDays || 0,
+    avgPerDay: r.avgRecordsPerDay || 0,
+    streak: r.longestStreak || 0,
+    items
+  };
+}
 
 Page({
   data: {
@@ -10,10 +27,17 @@ Page({
     bars: [], avgDaily: 0, maxFeed: 0, minFeed: 0, feedTimes: 0, monthly: [],
     activeBar: "", activeBarText: "",
     seriesTitle: "", series: [], seriesMeta: "", seriesUnit: "", seriesColor: "#2BB3A3",
-    seriesDigits: 1, seriesMinLabel: "", seriesMaxLabel: "", raw: {}
+    seriesDigits: 1, seriesMinLabel: "", seriesMaxLabel: "", raw: {},
+    record: { total: 0, days: 0, avgPerDay: 0, streak: 0, items: [] }
   },
 
-  onShow() { this.ensureBaby().then(() => this.load()); },
+  onShow() {
+    if (!this._loaded) { this.ensureBaby().then(() => this.load(false)); return; }
+    if (this.data.babyId && this.data.babyId !== app.globalData.currentBabyId) {
+      this.setData({ babyId: app.globalData.currentBabyId }, () => this.load(false)); return; // 切换宝宝
+    }
+    if (this._rev !== app.globalData.rev) this.load(true); // 记录变化：静默刷新
+  },
 
   async ensureBaby() {
     if (this.data.babyId) return;
@@ -26,25 +50,28 @@ Page({
     } catch (e) {}
   },
 
-  async load() {
+  async load(silent) {
     if (!this.data.babyId) return;
-    wx.showLoading({ title: "统计中" });
+    if (!silent) wx.showLoading({ title: "统计中" });
     try {
       const r = await data.stats(this.data.babyId, this.data.range);
-      this.setData({ raw: r, avgDaily: r.avgDaily, maxFeed: r.maxFeed, minFeed: r.minFeed, feedTimes: r.feedTimes, monthly: r.monthly });
+      this.setData({ raw: r, avgDaily: r.avgDaily, maxFeed: r.maxFeed, minFeed: r.minFeed, feedTimes: r.feedTimes, monthly: r.monthly, record: buildRecord(r) });
       this.render();
+      this._loaded = true;
     } catch (e) {}
-    wx.hideLoading();
+    if (!silent) wx.hideLoading();
+    this._rev = app.globalData.rev;
   },
 
   setTab(e) { this.setData({ tab: e.currentTarget.dataset.t }, () => this.render()); },
-  setRange(e) { this.setData({ range: e.currentTarget.dataset.r, activeBar: "", activeBarText: "" }, () => this.load()); },
+  setRange(e) { this.setData({ range: e.currentTarget.dataset.r, activeBar: "", activeBarText: "" }, () => this.load(false)); },
   onBarTap(e) {
     const ds = e.currentTarget.dataset;
     this.setData({ activeBar: ds.date || ds.label, activeBarText: ds.label + " · " + ds.total + "ml" });
   },
 
   render() {
+    if (this.data.tab === "record") return; // 记录 tab 直接展示 load 里算好的 record 模型
     const r = this.data.raw;
     if (this.data.tab === "milk") {
       const days = r.days || [];

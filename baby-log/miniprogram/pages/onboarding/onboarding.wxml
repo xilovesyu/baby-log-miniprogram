@@ -32,4 +32,7 @@
   <view class="mt16 center">
     <text class="muted small" bindtap="goImport">有现成 Excel 记录？先导入 ›</text>
   </view>
+  <view class="center mt8">
+    <text class="muted small" bindtap="goShareView">已有口令？只读查看他人宝宝 ›</text>
+  </view>
 </view>

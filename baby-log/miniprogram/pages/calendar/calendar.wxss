@@ -8,10 +8,19 @@
 .dcell.future { opacity: .4; }
 .dnum { font-size: 30rpx; font-weight: 600; }
 .dmilk { font-size: 18rpx; color: var(--text-sub); height: 26rpx; }
-.dots { height: 16rpx; }
-.dot { display: inline-block; width: 8rpx; height: 8rpx; border-radius: 50%; margin: 0 2rpx; }
-.dot.solid { background: var(--food); } .dot.temp { background: #E8A0A0; } .dot.weight { background: #7C9CE0; }
+.dots { height: 18rpx; }
+.dot { display: inline-block; width: 10rpx; height: 10rpx; border-radius: 50%; margin: 0 3rpx; }
+.dot.solid { background: #F59E0B; }
+.dot.diaper { background: #8D6E63; }
+.dot.temp { background: #E8A0A0; } .dot.weight { background: #7C9CE0; }
+.legend { display: flex; justify-content: center; margin-top: 12rpx; }
+.lg { display: flex; align-items: center; font-size: 22rpx; color: var(--text-sub); margin: 0 16rpx; }
+.lg .dot { margin: 0 8rpx 0 0; }
 
 .mask { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 10; }
 .drawer { position: fixed; left: 0; right: 0; bottom: 0; background: #fff; border-radius: 24rpx 24rpx 0 0; padding: 28rpx 28rpx 40rpx; z-index: 11; max-height: 80vh; }
 .drawer-body { max-height: 50vh; margin-top: 8rpx; }
+.add-title { font-size: 26rpx; color: var(--text-sub); margin-top: 16rpx; }
+.addrow { display: flex; flex-wrap: wrap; margin-top: 8rpx; }
+.addbtn { width: 33.33%; display: flex; flex-direction: column; align-items: center; padding: 16rpx 0; color: var(--text); font-size: 24rpx; }
+.addbtn .ai { font-size: 44rpx; margin-bottom: 6rpx; }

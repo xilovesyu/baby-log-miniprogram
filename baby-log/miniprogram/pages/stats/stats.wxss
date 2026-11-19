@@ -22,3 +22,15 @@
 .chartbox { margin-top: 12rpx; }
 .bar-info { font-size: 26rpx; color: var(--primary); min-height: 40rpx; padding: 8rpx 0; }
 .bar.on { background: #1E8C80; }
+
+/* 记录统计 */
+.grid3 { display: flex; margin: 16rpx -8rpx 0; }
+.grid3 > .cell { width: 33.33%; padding: 0 8rpx; box-sizing: border-box; }
+.hero { text-align: center; padding: 20rpx 0 8rpx; }
+.hero-num { font-size: 64rpx; font-weight: 700; color: var(--primary); }
+.hero-unit { font-size: 26rpx; font-weight: 400; color: var(--text-sub); margin-left: 6rpx; }
+.rcount { display: flex; align-items: center; padding: 12rpx 0; }
+.rlabel { width: 88rpx; font-size: 26rpx; color: var(--text); flex-shrink: 0; }
+.rtrack { flex: 1; height: 20rpx; background: #F1F3F6; border-radius: 10rpx; overflow: hidden; margin: 0 16rpx; }
+.rbar { height: 20rpx; border-radius: 10rpx; min-width: 4rpx; }
+.rnum { width: 72rpx; text-align: right; font-size: 26rpx; font-weight: 600; }

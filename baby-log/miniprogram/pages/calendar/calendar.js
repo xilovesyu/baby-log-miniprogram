@@ -3,6 +3,7 @@ const babySvc = require("../../services/baby");
 const data = require("../../services/data");
 const recordSvc = require("../../services/record");
 const U = require("../../utils/date");
+const rt = require("../../utils/recordTypes");
 
 const WEEKS = ["日", "一", "二", "三", "四", "五", "六"];
 
@@ -10,10 +11,17 @@ Page({
   data: {
     babyId: "", ym: U.monthKey(U.todayStr()), monthLabel: U.monthLabel(U.todayStr()),
     weeks: WEEKS, cells: [], monthTotal: 0, cumulative: 0, avgDaily: 0,
-    selectedDate: "", selectedSummary: {}, selectedEvents: []
+    selectedDate: "", selectedSummary: {}, selectedEvents: [],
+    addTypes: rt.QUICK, legend: rt.DOTS
   },
 
-  onShow() { this.ensureBaby().then(() => this.load()); },
+  onShow() {
+    if (!this._loaded) { this.ensureBaby().then(() => this.load(false)); return; }
+    if (this.data.babyId && this.data.babyId !== app.globalData.currentBabyId) {
+      this.setData({ babyId: app.globalData.currentBabyId }, () => this.load(false)); return; // 切换宝宝
+    }
+    if (this._rev !== app.globalData.rev) this.load(true); // 记录变化：静默刷新
+  },
 
   async ensureBaby() {
     if (this.data.babyId) return;
@@ -27,9 +35,9 @@ Page({
     } catch (e) {}
   },
 
-  async load() {
+  async load(silent) {
     if (!this.data.babyId) return;
-    wx.showLoading({ title: "加载中" });
+    if (!silent) wx.showLoading({ title: "加载中" });
     try {
       const r = await data.calendarMonth(this.data.babyId, this.data.ym);
       this._days = r.days || {};
@@ -39,8 +47,10 @@ Page({
         monthTotal: r.monthTotal, cumulative: r.cumulative, avgDaily,
         monthLabel: U.monthLabel(this.data.ym + "-01")
       });
+      this._loaded = true;
     } catch (e) {}
-    wx.hideLoading();
+    if (!silent) wx.hideLoading();
+    this._rev = app.globalData.rev;
   },
 
   buildCells(ym, days, selected) {
@@ -59,6 +69,7 @@ Page({
         key: ds, day: d, date: ds, recorded,
         total: s ? s.totalMilkMl : 0,
         hasSolid: s ? s.solidCount > 0 : false,
+        hasDiaper: s ? s.diaperCount > 0 : false,
         hasTemp: false, hasWeight: false,
         isFuture: ds > today,
         selected: ds === sel
@@ -70,12 +81,12 @@ Page({
   prevMonth() {
     const [y, m] = this.data.ym.split("-").map(Number);
     const d = new Date(y, m - 2, 1);
-    this.setData({ ym: d.getFullYear() + "-" + U.pad(d.getMonth() + 1), selectedDate: "" }, () => this.load());
+    this.setData({ ym: d.getFullYear() + "-" + U.pad(d.getMonth() + 1), selectedDate: "" }, () => this.load(false));
   },
   nextMonth() {
     const [y, m] = this.data.ym.split("-").map(Number);
     const d = new Date(y, m, 1);
-    this.setData({ ym: d.getFullYear() + "-" + U.pad(d.getMonth() + 1), selectedDate: "" }, () => this.load());
+    this.setData({ ym: d.getFullYear() + "-" + U.pad(d.getMonth() + 1), selectedDate: "" }, () => this.load(false));
   },
 
   async openDay(e) {
@@ -97,7 +108,8 @@ Page({
     const it = e.currentTarget.dataset.item;
     wx.navigateTo({ url: "/pages/record/record?type=" + it.type + "&id=" + it.id + "&babyId=" + this.data.babyId });
   },
-  addOnDay() {
-    wx.navigateTo({ url: "/pages/record/record?type=feeding&babyId=" + this.data.babyId + "&date=" + this.data.selectedDate });
+  addOnDay(e) {
+    const type = e.currentTarget.dataset.type;
+    wx.navigateTo({ url: "/pages/record/record?type=" + type + "&babyId=" + this.data.babyId + "&date=" + this.data.selectedDate });
   }
 });

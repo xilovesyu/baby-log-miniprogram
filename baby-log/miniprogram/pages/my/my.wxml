@@ -22,6 +22,7 @@
     <view class="menu-row" bindtap="goFamily"><text>共同照护者 / 只读分享</text><text class="muted">›</text></view>
     <view class="menu-row" bindtap="doImport"><text>导入 Excel 记录</text><text class="muted small">从微信选择表格</text></view>
     <view class="menu-row" bindtap="createShare"><text>只读分享给家人/医生</text><text class="muted">›</text></view>
+    <view class="menu-row" bindtap="goShareView"><text>只读查看他人宝宝</text><text class="muted">输入口令 ›</text></view>
     <view class="menu-row" bindtap="exportData"><text>数据导出</text><text class="muted small">导出为表格文件</text></view>
     <view class="menu-row" bindtap="createNew"><text>新建宝宝</text><text class="muted">›</text></view>
   </view>

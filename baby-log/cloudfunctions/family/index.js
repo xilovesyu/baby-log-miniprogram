@@ -12,6 +12,7 @@ function code(n) {
 }
 
 async function getBaby(babyId) {
+  if (!babyId) return null;
   const r = await db.collection("babies").doc(babyId).get().catch(() => null);
   return r && r.data;
 }
@@ -22,8 +23,13 @@ const inFamily = (openid, baby) =>
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext();
   const { action, babyId } = event;
-  const baby = await getBaby(babyId);
-  if (!baby) return { ok: false, msg: "宝宝不存在" };
+  // accept 只需邀请码（加入者不知道 babyId），不依赖顶部 baby；其余 action 需要已存在的宝宝上下文
+  let baby = null;
+  if (action !== "accept") {
+    if (!babyId) return { ok: false, msg: "缺少 babyId" };
+    baby = await getBaby(babyId);
+    if (!baby) return { ok: false, msg: "宝宝不存在" };
+  }
 
   // 生成邀请码（仅 owner / editor）
   if (action === "createInvite") {

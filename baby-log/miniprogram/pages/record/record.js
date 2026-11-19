@@ -2,8 +2,8 @@ const app = getApp();
 const recordSvc = require("../../services/record");
 const date = require("../../utils/date");
 const units = require("../../utils/units");
+const rt = require("../../utils/recordTypes");
 
-const TITLES = { feeding: "记一次吃奶", solid: "记辅食", diaper: "记便便", sleep: "记睡眠", temp: "记体温", weight: "记体重", jaundice: "记黄疸" };
 const MEALS = [{ label: "早餐", value: "breakfast" }, { label: "午餐", value: "lunch" }, { label: "晚餐", value: "dinner" }, { label: "加餐", value: "snack" }];
 const TEXTURES = ["糊状", "稀", "干硬", "水样", "正常"];
 const COLORS = ["黄色", "绿色", "棕色", "褐色", "黑色", "灰白"];
@@ -32,7 +32,7 @@ Page({
     const type = q.type || "feeding";
     const d = q.date || date.todayStr(), t = date.nowHM();
     this.setData({
-      type, title: TITLES[type] || "记录", babyId: q.babyId || (app.globalData.currentBaby && app.globalData.currentBaby._id),
+      type, title: rt.title(type), babyId: q.babyId || (app.globalData.currentBaby && app.globalData.currentBaby._id),
       today: d, "form.date": d, "form.time": t,
       tempAlertC: (app.globalData.currentBaby && app.globalData.currentBaby.tempAlertC) || 37.3,
       lastAmount: app.globalData.lastFeedAmount || null

@@ -3,6 +3,7 @@ const babySvc = require("../../services/baby");
 const recordSvc = require("../../services/record");
 const data = require("../../services/data");
 const date = require("../../utils/date");
+const rt = require("../../utils/recordTypes");
 
 function fmtSleep(min) {
   if (!min) return "0h0m";
@@ -11,27 +12,42 @@ function fmtSleep(min) {
 
 Page({
   data: {
-    cloudReady: false, babyId: "", baby: {}, ageText: "", date: "", dateLabel: "",
+    cloudReady: false, loading: true, babyId: "", baby: {}, ageText: "", date: "", dateLabel: "",
     summary: { totalMilkMl: 0, feedCount: 0, avgPerFeed: 0, solidCount: 0, diaperCount: 0, sleepMin: 0, cumulativeMilkMl: 0 },
-    cumulative: 0, sleepText: "0h0m", events: [], canEdit: true
+    cumulative: 0, sleepText: "0h0m", events: [], canEdit: true, quickTypes: rt.QUICK
   },
 
-  onLoad() { this.setData({ cloudReady: app.globalData.cloudReady }); },
+  onLoad() {
+    const ready = app.globalData.cloudReady;
+    this.setData({ cloudReady: ready, loading: !!ready });
+  },
 
-  onShow() { this.load(); },
-  onPullDownRefresh() { this.load().then(() => wx.stopPullDownRefresh()); },
+  onShow() {
+    if (!this._loaded) { this.load(false); return; }
+    const cur = app.globalData.currentBaby;
+    if (!cur || cur._id !== this.data.babyId) { this.load(false); return; } // 无宝宝 / 切换宝宝：完整重载
+    if (this._rev !== app.globalData.rev) this.load(true);                 // 记录变化：静默单次刷新
+  },
+  onPullDownRefresh() { this.load(true).then(() => wx.stopPullDownRefresh()); },
 
-  async load() {
-    if (!this.data.cloudReady) return;
+  async load(silent) {
+    if (!this.data.cloudReady) { this.setData({ loading: false }); return; }
+    if (!silent) this.setData({ loading: true });
     try {
-      let babies = await babySvc.list();
-      if (!babies || !babies.length) {
-        wx.navigateTo({ url: "/pages/onboarding/onboarding" });
-        return;
+      let cur;
+      if (silent && this.data.babyId) {
+        cur = this.data.baby;
+      } else {
+        let babies = await babySvc.list();
+        if (!babies || !babies.length) {
+          this.setData({ loading: false });
+          wx.navigateTo({ url: "/pages/onboarding/onboarding" });
+          return;
+        }
+        cur = babies.find(b => b._id === app.globalData.currentBabyId) || babies[0];
+        if (cur._id !== app.globalData.currentBabyId) babySvc.setCurrent(app, cur);
+        this.setData({ babyId: cur._id, baby: cur, ageText: date.ageText(cur.birthDate) });
       }
-      let cur = babies.find(b => b._id === app.globalData.currentBabyId) || babies[0];
-      if (cur._id !== app.globalData.currentBabyId) babySvc.setCurrent(app, cur);
-      this.setData({ babyId: cur._id, baby: cur, ageText: date.ageText(cur.birthDate) });
 
       const today = date.todayStr();
       const res = await data.home(cur._id, today);
@@ -45,12 +61,16 @@ Page({
         canEdit: res.canEdit
       });
       app.globalData.lastFeedAmount = res.lastAmount || null;
+      this._loaded = true;
     } catch (e) {
       console.error(e);
+    } finally {
+      if (!silent) this.setData({ loading: false });
+      this._rev = app.globalData.rev;
     }
   },
 
-  goMy() { wx.navigateTo({ url: "/pages/my/my" }); },
+  goMy() { wx.switchTab({ url: "/pages/my/my" }); },
 
   goRecord(e) {
     if (!this.data.canEdit) return wx.showToast({ title: "只读分享，无法记录", icon: "none" });
@@ -73,7 +93,7 @@ Page({
         if (!r.confirm) return;
         await recordSvc.remove(this.data.babyId, it.type, it.id);
         wx.showToast({ title: "已删除", icon: "success" });
-        this.load();
+        this.load(true);
       }
     });
   }
